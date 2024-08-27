@@ -24,7 +24,14 @@ class PutItemInDrawer(Task):
     def init_episode(self, index) -> List[str]:
         option = self._options[index]
         anchor = self._anchors[index]
-        self._waypoint1.set_position(anchor.get_position())
+        if self.use_failure_variation:
+            opt_indices = list(range(0, len(self._options)))
+            opt_indices.remove(index)
+            fail_idx = np.random.choice(opt_indices)
+            fail_anchor = self._anchors[fail_idx]
+            self._waypoint1.set_position(fail_anchor.get_position())
+        else:
+            self._waypoint1.set_position(anchor.get_position())
         success_sensor = ProximitySensor('success_' + option)
         self.register_success_conditions(
             [DetectedCondition(self._item, success_sensor)])

@@ -1,4 +1,5 @@
 from typing import List
+import numpy as np
 from pyrep.objects.shape import Shape
 from pyrep.objects.dummy import Dummy
 from pyrep.objects.proximity_sensor import ProximitySensor
@@ -47,7 +48,13 @@ class PlaceShapeInShapeSorter(Task):
         return len(SHAPE_NAMES)
 
     def _set_grasp(self, _):
-        gp = self.grasp_points[self.variation_index]
+        if self.use_failure_variation:
+            opt_indices = list(range(0, len(self.shapes)))
+            opt_indices.remove(self.variation_index)
+            fail_idx = np.random.choice(opt_indices)
+            gp = self.grasp_points[fail_idx]
+        else:
+            gp = self.grasp_points[self.variation_index]
         self.waypoint1.set_pose(gp.get_pose())
 
     def _set_drop(self, _):

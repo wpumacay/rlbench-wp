@@ -18,7 +18,13 @@ class OpenDrawer(Task):
 
     def init_episode(self, index: int) -> List[str]:
         option = self._options[index]
-        self._waypoint1.set_position(self._anchors[index].get_position())
+        if self.use_failure_variation:
+            opt_indices = list(range(0, len(self._options)))
+            opt_indices.remove(index)
+            fail_idx = np.random.choice(opt_indices)
+            self._waypoint1.set_position(self._anchors[fail_idx].get_position())
+        else:
+            self._waypoint1.set_position(self._anchors[index].get_position())
         self.register_success_conditions(
             [JointCondition(self._joints[index], 0.15)])
         return ['open %s drawer' % option,

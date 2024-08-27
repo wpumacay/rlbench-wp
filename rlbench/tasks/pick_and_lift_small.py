@@ -1,4 +1,5 @@
 from typing import List
+import numpy as np
 from pyrep.objects import Dummy
 from pyrep.objects.shape import Shape
 from pyrep.objects.proximity_sensor import ProximitySensor
@@ -36,7 +37,13 @@ class PickAndLiftSmall(Task):
         for sh in self._shapes:
             self.boundary.sample(sh, min_distance=0.1)
 
-        self._w1.set_pose(self._grasp_points[index].get_pose())
+        if self.use_failure_variation:
+            opt_indices = list(range(0, len(self._shapes)))
+            opt_indices.remove(index)
+            fail_idx = np.random.choice(opt_indices)
+            self._w1.set_pose(self._grasp_points[fail_idx].get_pose())
+        else:
+            self._w1.set_pose(self._grasp_points[index].get_pose())
 
         return ['pick up the %s and lift it up to the target' %
                 SHAPE_NAMES[index],

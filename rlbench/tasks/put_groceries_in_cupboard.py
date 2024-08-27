@@ -1,4 +1,5 @@
 from typing import List, Tuple
+import numpy as np
 from pyrep.objects.shape import Shape
 from pyrep.objects.dummy import Dummy
 from pyrep.objects.object import Object
@@ -34,7 +35,13 @@ class PutGroceriesInCupboard(Task):
     def init_episode(self, index: int) -> List[str]:
         self.boundary.clear()
         [self.boundary.sample(g, min_distance=0.1) for g in self.groceries]
-        self.waypoint1.set_pose(self.grasp_points[index].get_pose())
+        if self.use_failure_variation:
+            opt_indices = list(range(0, len(self.groceries)))
+            opt_indices.remove(index)
+            fail_idx = np.random.choice(opt_indices)
+            self.waypoint1.set_pose(self.grasp_points[fail_idx].get_pose())
+        else:
+            self.waypoint1.set_pose(self.grasp_points[index].get_pose())
         self.register_success_conditions(
             [DetectedCondition(self.groceries[index],
                                ProximitySensor('success')),

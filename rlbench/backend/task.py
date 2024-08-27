@@ -45,6 +45,8 @@ class Task(object):
         self._waypoints_should_repeat = lambda: False
         self._initial_objs_in_scene = None
         self._stop_at_waypoint_index = -1
+        # Flag used for overriding the init_episode for failure cases
+        self.use_failure_variation = False
 
     ########################
     # Overriding functions #
